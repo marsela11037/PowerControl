@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#f5f5f7" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <title>Power Control</title>
+  <link rel="manifest" href="/static/manifest.json" />
+  <style>
+    * { 
+      box-sizing: border-box; 
+      -webkit-tap-highlight-color: transparent;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      min-height: 100vh;
+      min-height: -webkit-fill-available;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+      background: #f5f5f7;
+      color: #1d1d1f;
+    }
+    
+    .container {
+      width: 100%;
+      max-width: 480px;
+      animation: fadeIn 0.4s ease;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    
+    h1 { 
+      font-size: 32px; 
+      font-weight: 700;
+      color: #1d1d1f;
+      margin-bottom: 8px;
+      letter-spacing: -0.5px;
+    }
+    
+    .subtitle { 
+      font-size: 15px;
+      color: #86868b;
+      font-weight: 400;
+    }
+    
+    .card {
+      background: #ffffff;
+      border-radius: 16px;
+      border: 1px solid #d2d2d7;
+      padding: 24px;
+      margin-bottom: 16px;
+    }
+    
+    .input-group {
+      margin-bottom: 0;
+    }
+    
+    label { 
+      display: block; 
+      margin-bottom: 8px; 
+      color: #86868b; 
+      font-size: 13px; 
+      font-weight: 400;
+    }
+    
+    input {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 10px;
+      border: 1px solid #d2d2d7;
+      background: #ffffff;
+      color: #1d1d1f;
+      outline: none;
+      font-size: 17px;
+      transition: border-color 0.2s ease;
+      font-family: inherit;
+    }
+    
+    input:focus {
+      border-color: #007aff;
+    }
+    
+    .button-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    
+    @media (max-width: 380px) {
+      .button-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    button {
+      padding: 14px 20px;
+      border-radius: 10px;
+      border: 1px solid #d2d2d7;
+      cursor: pointer;
+      font-weight: 400;
+      font-size: 17px;
+      transition: all 0.2s ease;
+      background: #ffffff;
+      color: #1d1d1f;
+      font-family: inherit;
+      min-height: 50px;
+    }
+    
+    button:active {
+      transform: scale(0.98);
+      opacity: 0.8;
+    }
+    
+    button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+    
+    .btn-primary {
+      background: #007aff;
+      color: #ffffff;
+      border-color: #007aff;
+      font-weight: 500;
+    }
+    
+    .btn-primary:active {
+      background: #0051d5;
+    }
+    
+    .btn-success {
+      background: #34c759;
+      color: #ffffff;
+      border-color: #34c759;
+      font-weight: 500;
+    }
+    
+    .btn-success:active {
+      background: #2da94c;
+    }
+    
+    .btn-purple {
+      background: #af52de;
+      color: #ffffff;
+      border-color: #af52de;
+      font-weight: 500;
+    }
+    
+    .btn-purple:active {
+      background: #9742c6;
+    }
+    
+    .btn-danger {
+      background: #ff3b30;
+      color: #ffffff;
+      border-color: #ff3b30;
+      font-weight: 500;
+    }
+    
+    .btn-danger:active {
+      background: #d92b20;
+    }
+    
+    .btn-full {
+      grid-column: 1 / -1;
+    }
+    
+    .status {
+      margin-top: 16px;
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-size: 15px;
+      display: none;
+      animation: slideIn 0.3s ease;
+    }
+    
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .status.show { display: block; }
+    
+    .status.success {
+      background: #d1f4e0;
+      color: #1d6f42;
+      border: 1px solid #34c759;
+    }
+    
+    .status.error {
+      background: #ffe5e5;
+      color: #c41e1e;
+      border: 1px solid #ff3b30;
+    }
+    
+    .hint {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 13px;
+      color: #86868b;
+      line-height: 1.5;
+    }
+    
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      display: inline-block;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .install-prompt {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      right: 20px;
+      max-width: 400px;
+      margin: 0 auto;
+      padding: 16px 20px;
+      background: #1d1d1f;
+      color: #ffffff;
+      border-radius: 14px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+      display: none;
+      animation: slideUp 0.3s ease;
+      z-index: 1000;
+    }
+    
+    @keyframes slideUp {
+      from { transform: translateY(100px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    
+    .install-prompt.show { display: block; }
+    
+    .install-prompt-title {
+      font-weight: 600;
+      margin-bottom: 4px;
+      font-size: 15px;
+    }
+    
+    .install-prompt-text {
+      font-size: 13px;
+      opacity: 0.8;
+      margin-bottom: 12px;
+    }
+    
+    .install-buttons {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .install-buttons button {
+      flex: 1;
+      padding: 10px;
+      min-height: auto;
+      font-size: 15px;
+      border-radius: 8px;
+    }
+    
+    /* Модальное окно планирования */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      animation: fadeIn 0.2s ease;
+    }
+    
+    .modal-overlay.show {
+      display: flex;
+    }
+    
+    .modal {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 24px;
+      width: 90%;
+      max-width: 400px;
+      max-height: 90vh;
+      overflow-y: auto;
+      animation: slideUp 0.3s ease;
+      box-sizing: border-box;
+    }
+    
+    .modal-title {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      color: #1d1d1f;
+    }
+    
+    .modal-section {
+      margin-bottom: 20px;
+    }
+    
+    .modal-section label {
+      display: block;
+      margin-bottom: 8px;
+      color: #86868b;
+      font-size: 13px;
+    }
+    
+    .action-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    
+    .action-btn {
+      padding: 12px;
+      border-radius: 10px;
+      border: 2px solid #d2d2d7;
+      background: #ffffff;
+      color: #1d1d1f;
+      font-size: 15px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .action-btn.selected {
+      border-color: #007aff;
+      background: #007aff;
+      color: #ffffff;
+    }
+    
+    .time-input {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 10px;
+      border: 1px solid #d2d2d7;
+      background: #ffffff;
+      color: #1d1d1f;
+      font-size: 17px;
+      font-family: inherit;
+      box-sizing: border-box;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+    }
+    
+    .time-input::-webkit-calendar-picker-indicator {
+      cursor: pointer;
+    }
+    
+    .modal-buttons {
+      display: flex;
+      gap: 8px;
+      margin-top: 20px;
+    }
+    
+    .modal-buttons button {
+      flex: 1;
+      min-height: 44px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Power Control</h1>
+      <p class="subtitle">Управление питанием ПК</p>
+    </div>
+
+    <div class="card">
+      <div class="input-group">
+        <label for="token">Токен доступа</label>
+        <div style="position: relative;">
+          <input id="token" type="password" placeholder="Введите токен..." autocomplete="off" style="padding-right: 45px;" />
+          <svg id="togglePassword" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; width: 20px; height: 20px; opacity: 0.5;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path id="eyeIcon" d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+            <circle id="eyeCircle" cx="12" cy="12" r="3"></circle>
+            <line id="eyeSlash" x1="1" y1="1" x2="23" y2="23" stroke="none"></line>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="button-grid">
+      <button class="btn-primary" id="btnHealth" type="button">Проверка</button>
+      <button class="btn-success" id="btnWake" type="button">Включить</button>
+      <button class="btn-purple btn-full" id="btnSleep" type="button">Сон</button>
+      <button class="btn-danger btn-full" id="btnOff" type="button">Выключить</button>
+      <button class="btn-full" id="btnSchedule" type="button" style="background: #f5f5f7; color: #007aff; border-color: #007aff;">⏰ Запланировать</button>
+    </div>
+
+    <div id="status" class="status"></div>
+
+    <div class="hint">
+      Откройте эту страницу на телефоне в той же Wi-Fi сети
+    </div>
+  </div>
+
+  <div id="installPrompt" class="install-prompt">
+    <div class="install-prompt-title">Установить приложение?</div>
+    <div class="install-prompt-text">Добавьте на домашний экран для быстрого доступа</div>
+    <div class="install-buttons">
+      <button class="btn-primary" id="btnInstall">Установить</button>
+      <button id="btnDismiss">Позже</button>
+    </div>
+  </div>
+
+  <!-- Модальное окно планирования -->
+  <div id="scheduleModal" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-title">Запланировать действие</div>
+      
+      <div class="modal-section">
+        <label>Выберите действие</label>
+        <div class="action-buttons">
+          <button class="action-btn" data-action="sleep">Сон</button>
+          <button class="action-btn" data-action="shutdown">Выключение</button>
+        </div>
+      </div>
+      
+      <div class="modal-section">
+        <label for="scheduleTime">Время выполнения</label>
+        <input type="time" id="scheduleTime" class="time-input" />
+      </div>
+      
+      <div class="modal-buttons">
+        <button id="btnCancelSchedule">Отмена</button>
+        <button class="btn-primary" id="btnConfirmSchedule">Запланировать</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Ждем загрузки DOM
+    document.addEventListener('DOMContentLoaded', function() {
+      // Регистрация Service Worker для PWA
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/static/sw.js').catch(() => {});
+      }
+
+      // PWA Install Prompt
+      let deferredPrompt;
+      const installPrompt = document.getElementById('installPrompt');
+      const btnInstall = document.getElementById('btnInstall');
+      const btnDismiss = document.getElementById('btnDismiss');
+
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        installPrompt.classList.add('show');
+      });
+
+      btnInstall.addEventListener('click', async () => {
+        if (deferredPrompt) {
+          deferredPrompt.prompt();
+          await deferredPrompt.userChoice;
+          deferredPrompt = null;
+          installPrompt.classList.remove('show');
+        }
+      });
+
+      btnDismiss.addEventListener('click', () => {
+        installPrompt.classList.remove('show');
+      });
+
+      // Основная логика
+      const tokenEl = document.getElementById("token");
+      const statusEl = document.getElementById("status");
+      const btnOff = document.getElementById("btnOff");
+      const btnSleep = document.getElementById("btnSleep");
+      const btnHealth = document.getElementById("btnHealth");
+      const btnWake = document.getElementById("btnWake");
+      const togglePassword = document.getElementById("togglePassword");
+
+      // Получаем токен из URL параметра или localStorage
+      const urlParams = new URLSearchParams(window.location.search);
+      const tokenFromUrl = urlParams.get('token');
+      
+      console.log('URL:', window.location.href);
+      console.log('Token from URL:', tokenFromUrl);
+      console.log('Token from localStorage:', localStorage.getItem("power_token"));
+      
+      // Функция для установки токена
+      function setToken(token) {
+        if (token) {
+          tokenEl.value = token;
+          // Принудительно триггерим событие input
+          tokenEl.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+      }
+      
+      if (tokenFromUrl) {
+        // Если токен в URL, используем его и сохраняем
+        console.log('Setting token from URL:', tokenFromUrl);
+        localStorage.setItem("power_token", tokenFromUrl);
+        // Устанавливаем с небольшой задержкой для надежности
+        setTimeout(() => setToken(tokenFromUrl), 100);
+      } else {
+        // Иначе берем из localStorage
+        const savedToken = localStorage.getItem("power_token") || "";
+        console.log('Setting token from localStorage:', savedToken);
+        setToken(savedToken);
+      }
+      
+      tokenEl.addEventListener("input", () => {
+        localStorage.setItem("power_token", tokenEl.value);
+      });
+
+    // Переключение видимости токена
+    const eyeSlash = document.getElementById("eyeSlash");
+    togglePassword.addEventListener("click", () => {
+      if (tokenEl.type === "password") {
+        tokenEl.type = "text";
+        eyeSlash.setAttribute("stroke", "currentColor");
+      } else {
+        tokenEl.type = "password";
+        eyeSlash.setAttribute("stroke", "none");
+      }
+    });
+    
+    togglePassword.addEventListener("mouseenter", () => {
+      togglePassword.style.opacity = "1";
+    });
+    
+    togglePassword.addEventListener("mouseleave", () => {
+      togglePassword.style.opacity = "0.5";
+    });
+
+    function show(msg, success) {
+      statusEl.textContent = msg;
+      statusEl.className = "status show " + (success ? "success" : "error");
+      setTimeout(() => statusEl.classList.remove('show'), 5000);
+    }
+
+    function setButtonLoading(btn, loading, originalText) {
+      if (loading) {
+        btn.disabled = true;
+        btn.innerHTML = '<div class="spinner"></div>';
+      } else {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+      }
+    }
+
+    async function postJson(path, body) {
+      const res = await fetch(path, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      let data = null;
+      try { data = await res.json(); } catch (_) {}
+      return { ok: res.ok, status: res.status, data };
+    }
+
+    btnHealth.addEventListener("click", async () => {
+      const originalHtml = btnHealth.innerHTML;
+      setButtonLoading(btnHealth, true);
+      try {
+        const r = await fetch("/health");
+        show(r.ok ? "Сервер доступен" : "Сервер недоступен", r.ok);
+      } catch (e) {
+        show("Ошибка сети: " + e.message, false);
+      } finally {
+        setButtonLoading(btnHealth, false, originalHtml);
+      }
+    });
+
+    btnWake.addEventListener("click", async () => {
+      const token = tokenEl.value.trim();
+      if (!token) { show("Введите токен", false); return; }
+      if (!confirm("Отправить Wake-on-LAN (включить ПК)?")) return;
+
+      const originalHtml = btnWake.innerHTML;
+      setButtonLoading(btnWake, true);
+      try {
+        const r = await postJson("/api/wake", { token, pc_id: "my_pc" });
+        const msg = (r.data?.message) || ("HTTP " + r.status);
+        show(msg, r.ok);
+      } catch (e) {
+        show("Ошибка сети: " + e.message, false);
+      } finally {
+        setButtonLoading(btnWake, false, originalHtml);
+      }
+    });
+
+    btnOff.addEventListener("click", async () => {
+      const token = tokenEl.value.trim();
+      if (!token) { show("Введите токен", false); return; }
+      if (!confirm("Точно выключить ПК?")) return;
+
+      const originalHtml = btnOff.innerHTML;
+      setButtonLoading(btnOff, true);
+      try {
+        const r = await postJson("/api/shutdown", { token });
+        const msg = (r.data?.message) || ("HTTP " + r.status);
+        show(msg, r.ok);
+      } catch (e) {
+        show("Ошибка сети: " + e.message, false);
+      } finally {
+        setButtonLoading(btnOff, false, originalHtml);
+      }
+    });
+
+    btnSleep.addEventListener("click", async () => {
+      const token = tokenEl.value.trim();
+      if (!token) { show("Введите токен", false); return; }
+      if (!confirm("Перевести ПК в сон?")) return;
+
+      const originalHtml = btnSleep.innerHTML;
+      setButtonLoading(btnSleep, true);
+      try {
+        const r = await postJson("/api/sleep", { token });
+        const msg = (r.data?.message) || ("HTTP " + r.status);
+        show(msg, r.ok);
+      } catch (e) {
+        show("Ошибка сети: " + e.message, false);
+      } finally {
+        setButtonLoading(btnSleep, false, originalHtml);
+      }
+    });
+
+    // Планирование действий
+    const btnSchedule = document.getElementById("btnSchedule");
+    const scheduleModal = document.getElementById("scheduleModal");
+    const btnCancelSchedule = document.getElementById("btnCancelSchedule");
+    const btnConfirmSchedule = document.getElementById("btnConfirmSchedule");
+    const scheduleTime = document.getElementById("scheduleTime");
+    const actionButtons = document.querySelectorAll(".action-btn");
+    
+    let selectedAction = null;
+    let scheduleTimeout = null;
+
+    // Открыть модальное окно
+    btnSchedule.addEventListener("click", () => {
+      const now = new Date();
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      scheduleTime.value = `${hours}:${minutes}`;
+      scheduleModal.classList.add("show");
+    });
+
+    // Закрыть модальное окно
+    btnCancelSchedule.addEventListener("click", () => {
+      scheduleModal.classList.remove("show");
+      selectedAction = null;
+      actionButtons.forEach(btn => btn.classList.remove("selected"));
+    });
+
+    // Закрыть при клике на overlay
+    scheduleModal.addEventListener("click", (e) => {
+      if (e.target === scheduleModal) {
+        btnCancelSchedule.click();
+      }
+    });
+
+    // Выбор действия
+    actionButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        actionButtons.forEach(b => b.classList.remove("selected"));
+        btn.classList.add("selected");
+        selectedAction = btn.dataset.action;
+      });
+    });
+
+    // Подтвердить планирование
+    btnConfirmSchedule.addEventListener("click", () => {
+      const token = tokenEl.value.trim();
+      if (!token) {
+        show("Введите токен", false);
+        return;
+      }
+      
+      if (!selectedAction) {
+        show("Выберите действие", false);
+        return;
+      }
+      
+      if (!scheduleTime.value) {
+        show("Укажите время", false);
+        return;
+      }
+
+      // Вычисляем задержку
+      const [hours, minutes] = scheduleTime.value.split(':').map(Number);
+      const now = new Date();
+      const scheduledTime = new Date();
+      scheduledTime.setHours(hours, minutes, 0, 0);
+      
+      // Если время уже прошло сегодня, планируем на завтра
+      if (scheduledTime <= now) {
+        scheduledTime.setDate(scheduledTime.getDate() + 1);
+      }
+      
+      const delay = scheduledTime - now;
+      const delayMinutes = Math.round(delay / 60000);
+      
+      // Отменяем предыдущее планирование если есть
+      if (scheduleTimeout) {
+        clearTimeout(scheduleTimeout);
+      }
+      
+      // Планируем действие
+      scheduleTimeout = setTimeout(async () => {
+        const endpoint = selectedAction === "sleep" ? "/api/sleep" : "/api/shutdown";
+        const actionName = selectedAction === "sleep" ? "Сон" : "Выключение";
+        
+        try {
+          const r = await postJson(endpoint, { token });
+          const msg = (r.data?.message) || `${actionName} выполнено`;
+          show(msg, r.ok);
+        } catch (e) {
+          show("Ошибка: " + e.message, false);
+        }
+        
+        scheduleTimeout = null;
+      }, delay);
+      
+      // Обновляем кнопку
+      const actionText = selectedAction === "sleep" ? "Сон" : "Выключение";
+      const timeText = scheduleTime.value;
+      btnSchedule.innerHTML = `⏰ ${actionText} в ${timeText}`;
+      btnSchedule.style.background = "#34c759";
+      btnSchedule.style.color = "#ffffff";
+      btnSchedule.style.borderColor = "#34c759";
+      
+      show(`${actionText} запланировано на ${timeText} (через ${delayMinutes} мин)`, true);
+      scheduleModal.classList.remove("show");
+      selectedAction = null;
+      actionButtons.forEach(btn => btn.classList.remove("selected"));
+      
+      // Добавляем возможность отменить
+      btnSchedule.onclick = () => {
+        if (scheduleTimeout) {
+          clearTimeout(scheduleTimeout);
+          scheduleTimeout = null;
+          btnSchedule.innerHTML = "⏰ Запланировать";
+          btnSchedule.style.background = "#f5f5f7";
+          btnSchedule.style.color = "#007aff";
+          btnSchedule.style.borderColor = "#007aff";
+          btnSchedule.onclick = null;
+          show("Планирование отменено", true);
+        }
+      };
+    });
+    }); // Закрываем DOMContentLoaded
+  </script>
+</body>
+</html>
